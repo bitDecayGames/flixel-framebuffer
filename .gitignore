@@ -1,0 +1,12 @@
+# Build files
+/export
+
+# haxefmod integration
+fmod/CachedHaxeConstantsOutputLocation
+
+# FMOD
+fmod/.cache/
+
+# misc
+.VSCodeCounter/
+.DS_Store

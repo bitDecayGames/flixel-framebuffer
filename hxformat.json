@@ -7,7 +7,7 @@
 		}
 	},
 	"sameLine": {
-		"ifElse": "next",
+		"ifElse": "same",
 		"doWhile": "next",
 		"tryBody": "next",
 		"tryCatch": "next"

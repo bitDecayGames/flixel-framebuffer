@@ -13,22 +13,25 @@ import openfl.filters.ShaderFilter;
 class LightingState extends FlxState {
 	public var lightShader:LightingShader;
 	public var baseCam:FlxCamera;
-	public var normalCam:FlxCamera;
+	public var normalCamera:FlxCamera;
+
+	// This acts as our frame buffer. The normalCamera's view is drawn to this
+	// every frame so that it can be given to the shader
 	public var normalTexture:BitmapData;
 
 	// A private CameraFrontEnd instance to allow us to call the proper
 	// functions to render our normal camera outside of the standard
 	// FlxG.draw() process.
 	@:access(flixel.system.frontEnds.CameraFrontEnd)
-	private var normalCameras = new CameraFrontEnd();
+	private var normalCameraFrontEnd = new CameraFrontEnd();
 
 	override public function create():Void {
 		normalTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
-		normalCam = new FlxCamera();
-		normalCam.bgColor = FlxColor.BLACK;
+		normalCamera = new FlxCamera();
+		normalCamera.bgColor = FlxColor.BLACK;
 
 		// Some trickery to get our side CameraFrontEnd configured properly
-		normalCameras.reset(normalCam);
+		normalCameraFrontEnd.reset(normalCamera);
 		FlxG.cameras.reset();
 		baseCam = FlxG.camera;
 
@@ -43,7 +46,7 @@ class LightingState extends FlxState {
 		if (Std.isOfType(Object, LightSprite)) {
 			var lightSprite = cast(Object, LightSprite);
 			super.add(lightSprite.normal);
-			lightSprite.normal.cameras = [normalCam];
+			lightSprite.normal.cameras = [normalCamera];
 		}
 
 		return ret;
@@ -56,23 +59,23 @@ class LightingState extends FlxState {
 
 		// we need to render the normal composite before the main
 		// camera renders so that the shader has accurate inputs
-		normalCameras.lock();
+		normalCameraFrontEnd.lock();
 		// var oldCams = cameras;
 		// cameras = [normalCam];
 		super.draw();
 		// cameras = oldCams;
-		normalCam.render();
-		normalCameras.unlock();
+		normalCamera.render();
+		normalCameraFrontEnd.unlock();
 
-		normalTexture.draw(normalCam.canvas);
+		normalTexture.draw(normalCamera.canvas);
 	}
 
 	public function toggleLightingDebugCamera() {
-		if (FlxG.cameras.list.contains(normalCam)) {
-			FlxG.cameras.remove(normalCam, false);
+		if (FlxG.cameras.list.contains(normalCamera)) {
+			FlxG.cameras.remove(normalCamera, false);
 		}
 		else {
-			FlxG.cameras.add(normalCam, false);
+			FlxG.cameras.add(normalCamera, false);
 		}
 	}
 }

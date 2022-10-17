@@ -24,10 +24,8 @@ class LightingState extends FlxState {
 
 	override public function create():Void {
 		normalTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
-		// normalTexture = new FlxSprite();
-		// normalTexture.makeGraphic(FlxG.width, FlxG.height);
 		normalCam = new FlxCamera();
-		normalCam.bgColor = FlxColor.TRANSPARENT;
+		normalCam.bgColor = FlxColor.BLACK;
 
 		// Some trickery to get our side CameraFrontEnd configured properly
 		normalCameras.reset(normalCam);
@@ -38,7 +36,7 @@ class LightingState extends FlxState {
 		baseCam.setFilters([new ShaderFilter(lightShader)]);
 	}
 
-	// Makes sure to handle any normals and set cameras properly
+	// Makes sure to handle any LightSprites and set cameras properly
 	override function add(Object:FlxBasic):FlxBasic {
 		var ret = super.add(Object);
 
@@ -56,13 +54,13 @@ class LightingState extends FlxState {
 	override function draw() {
 		super.draw();
 
-		// we need to make sure this happens before the main camera
-		// renders so that the shader has the accurate data
+		// we need to render the normal composite before the main
+		// camera renders so that the shader has accurate inputs
 		normalCameras.lock();
-		var oldCams = cameras;
-		cameras = [normalCam];
+		// var oldCams = cameras;
+		// cameras = [normalCam];
 		super.draw();
-		cameras = oldCams;
+		// cameras = oldCams;
 		normalCam.render();
 		normalCameras.unlock();
 

@@ -1,4 +1,3 @@
-// HaxeFlixel imports
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -9,9 +8,6 @@ import flixel.math.FlxPoint;
 import flixel.system.frontEnds.CameraFrontEnd;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import flixelighting.FlxLight;
-import flixelighting.FlxLighting;
-import flixelighting.FlxNormalMap;
 import openfl.display.BitmapData;
 import openfl.display.Shader;
 import openfl.filters.ShaderFilter;
@@ -21,12 +17,17 @@ import openfl.geom.Rectangle;
 class PlayState extends LightingState {
 	public var lightPoint = FlxPoint.get(0.5, 0.5);
 
-	function makeDiamond() {
+	function getRandomPath(length:Int):Array<FlxPoint> {
 		var path = [
-			for (i in 0...10) {
+			for (i in 0...length) {
 				FlxPoint.get(FlxG.random.float(FlxG.width), FlxG.random.float(FlxG.height));
 			}
 		];
+		return path;
+	}
+
+	function makeDiamond() {
+		var path = getRandomPath(10);
 
 		var baseSprite = new LightSprite(AssetPaths.diamond__png, true, 32, 32);
 		baseSprite.pixelPerfectRender = true;
@@ -39,11 +40,7 @@ class PlayState extends LightingState {
 	}
 
 	function makeCircle() {
-		var path = [
-			for (i in 0...10) {
-				FlxPoint.get(FlxG.random.float(FlxG.width), FlxG.random.float(FlxG.height));
-			}
-		];
+		var path = getRandomPath(10);
 
 		var baseSprite = new LightSprite(AssetPaths.circle__png);
 		baseSprite.pixelPerfectRender = true;
@@ -51,6 +48,16 @@ class PlayState extends LightingState {
 		baseSprite.setPosition(path[0].x, path[0].y);
 		add(baseSprite);
 		FlxTween.linearPath(baseSprite, path, 30, {type: PINGPONG});
+	}
+
+	function makeUnshadedSprite() {
+		var path = getRandomPath(10);
+
+		var sprite = new FlxSprite();
+		sprite.pixelPerfectRender = true;
+		sprite.makeGraphic(32, 32, FlxColor.GRAY);
+		add(sprite);
+		FlxTween.linearPath(sprite, path, 30, {type: PINGPONG});
 	}
 
 	override public function create():Void {
@@ -62,6 +69,10 @@ class PlayState extends LightingState {
 
 		for (i in 0...10) {
 			makeCircle();
+		}
+
+		for (i in 0...10) {
+			makeUnshadedSprite();
 		}
 	}
 

@@ -3,8 +3,7 @@ import flixel.math.FlxPoint;
 import flixel.system.FlxAssets.FlxShader;
 import openfl.display.BitmapData;
 
-class LightingShader extends FlxShader
-{
+class LightingShader extends FlxShader {
 	@:glFragmentSource('
 		#pragma header
 		uniform sampler2D normalTex;
@@ -27,6 +26,13 @@ class LightingShader extends FlxShader
 			// pull out the color vectors from the source image and the normal image
 			vec4 source = flixel_texture2D(bitmap, openfl_TextureCoordv);
 			vec4 normal = texture2D(normalTex, openfl_TextureCoordv);
+
+			// Can remove this if-block to have sprites without normal data
+			// be considered as though no light is hitting them
+			if (length(normal.rgb) == 0.) {
+				// No normal data, so just use the input here?
+				return source;
+			}
 
 			vec2 distance = lPos - openfl_TextureCoordv;
 			distance *= vec2(1, aspectRatio);
@@ -71,7 +77,7 @@ class LightingShader extends FlxShader
 
 			// multiply the rgb of the source color vector by the angle/intensity to either brighten or dim the color at this pixel, and just use the original alpha from the source directly, dont manipulate that with light
 			source.rgb *= cos_angle;
-			source.a = 1.;
+			// source.a = 1.;
 
 			return source;
 		}
@@ -128,12 +134,11 @@ class LightingShader extends FlxShader
 			// vec4 tester = flixel_texture2D(normalTex, openfl_TextureCoordv);
 			// gl_FragColor = tester;
 		}')
-	public function new(pixels:BitmapData)
-	{
+	public function new(pixels:BitmapData) {
 		super();
 		setNormalMapPixels(pixels);
 		setLightPositions([new FlxPoint(0, 0)]);
-		setLightHeight(1);
+		setLightHeight(0.5);
 		setAmbientRatio(0.2);
 
 		var ratio = 1.0 * FlxG.width / FlxG.height;
@@ -141,52 +146,40 @@ class LightingShader extends FlxShader
 	}
 
 	// this is the normal sprite that you are going to pass into the shader
-	public function setNormalMapPixels(pixels:BitmapData)
-	{
+	public function setNormalMapPixels(pixels:BitmapData) {
 		normalTex.input = pixels;
 	}
 
 	// for this to work properly, you will need to convert your light position into local coordinates to the sprite, then into a ratio between 0-1 based on the sprite's total width (if it is a sprite sheet, you will need to take frameWidth * numOfFrames)
-	public function setLightPositions(positions:Array<FlxPoint>)
-	{
-		if (positions.length > 0)
-		{
+	public function setLightPositions(positions:Array<FlxPoint>) {
+		if (positions.length > 0) {
 			lightPos0.value = [positions[0].x, positions[0].y];
 		}
-		if (positions.length > 1)
-		{
+		if (positions.length > 1) {
 			lightPos1.value = [positions[1].x, positions[1].y];
 		}
-		if (positions.length > 2)
-		{
+		if (positions.length > 2) {
 			lightPos2.value = [positions[2].x, positions[2].y];
 		}
-		if (positions.length > 3)
-		{
+		if (positions.length > 3) {
 			lightPos3.value = [positions[3].x, positions[3].y];
 		}
-		if (positions.length > 4)
-		{
+		if (positions.length > 4) {
 			lightPos4.value = [positions[4].x, positions[4].y];
 		}
-		if (positions.length > 5)
-		{
+		if (positions.length > 5) {
 			lightPos5.value = [positions[5].x, positions[5].y];
 		}
-		if (positions.length > 6)
-		{
+		if (positions.length > 6) {
 			lightPos6.value = [positions[6].x, positions[6].y];
 		}
-		if (positions.length > 7)
-		{
+		if (positions.length > 7) {
 			lightPos7.value = [positions[7].x, positions[7].y];
 		}
-		if (positions.length > 8)
-		{
+		if (positions.length > 8) {
 			lightPos8.value = [positions[8].x, positions[8].y];
 		}
-		if (positions.length > 9)
-		{
+		if (positions.length > 9) {
 			lightPos9.value = [positions[9].x, positions[9].y];
 		}
 
@@ -194,14 +187,12 @@ class LightingShader extends FlxShader
 	}
 
 	// I'm not totally sure this is really what I'm saying it is, but theoretically this changes how high the light is in the "sky" compared to the flat sprite is on the "ground"
-	public function setLightHeight(height:Float)
-	{
+	public function setLightHeight(height:Float) {
 		lightHeight.value = [height];
 	}
 
 	// setting this ratio to 1 will basically ignore the lightsource completely and just bathe everything in full light, while setting to 0 will cause the sprite to draw black if there is no light directly on it (black, not transparent)
-	public function setAmbientRatio(ratio:Float)
-	{
+	public function setAmbientRatio(ratio:Float) {
 		if (ratio < 0)
 			ambientRatio.value = [0.0];
 		else if (ratio > 1.0)
@@ -210,8 +201,7 @@ class LightingShader extends FlxShader
 			ambientRatio.value = [ratio];
 	}
 
-	public function setAspectRatio(ratio:Float)
-	{
+	public function setAspectRatio(ratio:Float) {
 		aspectRatio.value = [ratio];
 	}
 }

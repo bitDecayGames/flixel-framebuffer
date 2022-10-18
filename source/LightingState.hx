@@ -12,30 +12,41 @@ import openfl.filters.ShaderFilter;
 // shader/filter.
 class LightingState extends FlxState {
 	public var lightShader:LightingShader;
+
 	public var baseCam:FlxCamera;
 	public var normalCamera:FlxCamera;
+	public var heightCamera:FlxCamera;
 
 	// This acts as our frame buffer. The normalCamera's view is drawn to this
 	// every frame so that it can be given to the shader
 	public var normalTexture:BitmapData;
 
+	// This acts as our frame buffer. The heightCamera's view is drawn to this
+	// every frame so that it can be given to the shader
+	public var heightTexture:BitmapData;
+
 	// A private CameraFrontEnd instance to allow us to call the proper
 	// functions to render our normal camera outside of the standard
 	// FlxG.draw() process.
 	@:access(flixel.system.frontEnds.CameraFrontEnd)
-	private var normalCameraFrontEnd = new CameraFrontEnd();
+	private var bufferCameraFrontEnd = new CameraFrontEnd();
 
 	override public function create():Void {
 		normalTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 		normalCamera = new FlxCamera();
 		normalCamera.bgColor = FlxColor.BLACK;
 
+		heightTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
+		heightCamera = new FlxCamera();
+		heightCamera.bgColor = FlxColor.BLACK;
+
 		// Some trickery to get our side CameraFrontEnd configured properly
-		normalCameraFrontEnd.reset(normalCamera);
+		bufferCameraFrontEnd.reset(normalCamera);
+		bufferCameraFrontEnd.add(heightCamera);
 		FlxG.cameras.reset();
 		baseCam = FlxG.camera;
 
-		lightShader = new LightingShader(normalTexture);
+		lightShader = new LightingShader(normalTexture, heightTexture);
 		baseCam.setFilters([new ShaderFilter(lightShader)]);
 	}
 
@@ -45,8 +56,10 @@ class LightingState extends FlxState {
 
 		if (Std.isOfType(Object, LightSprite)) {
 			var lightSprite = cast(Object, LightSprite);
-			super.add(lightSprite.normal);
-			lightSprite.normal.cameras = [normalCamera];
+			super.add(lightSprite.normalMap);
+			super.add(lightSprite.heightMap);
+			lightSprite.normalMap.cameras = [normalCamera];
+			lightSprite.heightMap.cameras = [heightCamera];
 		}
 
 		return ret;
@@ -57,24 +70,27 @@ class LightingState extends FlxState {
 	override function draw() {
 		super.draw();
 
-		// we need to render the normal composite before the main
+		// we need to render the composites before the main FlxGame
 		// camera renders so that the shader has accurate inputs
-		normalCameraFrontEnd.lock();
-		// var oldCams = cameras;
-		// cameras = [normalCam];
+		bufferCameraFrontEnd.lock();
 		super.draw();
-		// cameras = oldCams;
 		normalCamera.render();
-		normalCameraFrontEnd.unlock();
+		heightCamera.render();
+		bufferCameraFrontEnd.unlock();
 
+		// capture our camera views to textures
 		normalTexture.draw(normalCamera.canvas);
+		heightTexture.draw(heightCamera.canvas);
 	}
 
+	// allows us to cycle through the cameras
 	public function toggleLightingDebugCamera() {
 		if (FlxG.cameras.list.contains(normalCamera)) {
 			FlxG.cameras.remove(normalCamera, false);
-		}
-		else {
+			FlxG.cameras.add(heightCamera, false);
+		} else if (FlxG.cameras.list.contains(heightCamera)) {
+			FlxG.cameras.remove(heightCamera, false);
+		} else {
 			FlxG.cameras.add(normalCamera, false);
 		}
 	}

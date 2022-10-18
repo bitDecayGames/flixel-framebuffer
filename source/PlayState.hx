@@ -1,19 +1,9 @@
-import flixel.FlxBasic;
-import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.FlxState;
-import flixel.addons.display.FlxShaderMaskCamera;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.system.frontEnds.CameraFrontEnd;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import openfl.display.BitmapData;
-import openfl.display.Shader;
-import openfl.filters.ShaderFilter;
-import openfl.geom.Point;
-import openfl.geom.Rectangle;
 
 class PlayState extends LightingState {
 	public var lightPoint = FlxPoint.get(0.4, 0.2);
@@ -53,8 +43,7 @@ class PlayState extends LightingState {
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 
-		// lightShader.setLightPositions([lightPoint, lightPoint2], [lightHeight, lightHeight2]);
-		lightShader.setLightPositions([lightPoint], [lightHeight]);
+		lightShader.setLightPositions([lightPoint, lightPoint2], [lightHeight, lightHeight2]);
 
 		if (FlxG.keys.justPressed.SPACE) {
 			toggleLightingDebugCamera();

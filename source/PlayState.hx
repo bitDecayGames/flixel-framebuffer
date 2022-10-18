@@ -19,11 +19,15 @@ class PlayState extends LightingState {
 	public var lightPoint = FlxPoint.get(0.4, 0.2);
 	public var lightPoint2 = FlxPoint.get(0.2, 0.8);
 
-	public var lightHeight = 0.0;
+	public var lightHeight = 0.05;
 	public var lightHeight2 = 1.0;
 
 	override public function create():Void {
 		super.create();
+
+		for (i in 0...5) {
+			makeUnshadedSprite();
+		}
 
 		for (i in 0...10) {
 			makeDiamond();
@@ -33,27 +37,24 @@ class PlayState extends LightingState {
 			makeCircle();
 		}
 
-		// for (i in 0...100) {
-		// 	makeUnshadedSprite();
-		// }
-
-		// FlxTween.tween(this, {"lightHeight": 1.0}, 2, {type: PINGPONG});
-		// FlxTween.tween(this, {"lightHeight2": 0.0}, 3, {type: PINGPONG});
 		FlxG.watch.add(this, "lightHeight", "Light1 Height:");
 		FlxG.watch.add(this, "lightHeight2", "Light2 Height:");
 
-		lightShader.lightColor1.value = [0.0, 1.0, 1.0];
-		lightShader.lightColor2.value = [1.0, 1.0, 0.0];
+		lightShader.lightColor1.value = [0.0, 4.0, 4.0];
+		lightShader.lightColor2.value = [10.0, 1.0, 0.0];
 		lightShader.lightColor3.value = [1.0, 0.0, 0.0];
 
-		lightShader.ambientColor.value = [1.0, 0.0, 1.0];
+		lightShader.ambientColor.value = [1.0, 1.0, 1.0];
 		lightShader.ambientStrength.value = [0.2];
+
+		lightShader.debugLights.value = [true];
 	}
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 
-		lightShader.setLightPositions([lightPoint, lightPoint2], [lightHeight, lightHeight2]);
+		// lightShader.setLightPositions([lightPoint, lightPoint2], [lightHeight, lightHeight2]);
+		lightShader.setLightPositions([lightPoint], [lightHeight]);
 
 		if (FlxG.keys.justPressed.SPACE) {
 			toggleLightingDebugCamera();
@@ -65,9 +66,9 @@ class PlayState extends LightingState {
 			lightPoint.y /= FlxG.height;
 
 			if (FlxG.mouse.wheel > 0) {
-				lightHeight = FlxMath.bound(lightHeight + 0.1, 0, 1);
+				lightHeight = FlxMath.bound(lightHeight + 0.1, 0.01, 1);
 			} else if (FlxG.mouse.wheel < 0) {
-				lightHeight = FlxMath.bound(lightHeight - 0.1, 0, 1);
+				lightHeight = FlxMath.bound(lightHeight - 0.1, 0.01, 1);
 			}
 		}
 
@@ -77,9 +78,9 @@ class PlayState extends LightingState {
 			lightPoint2.y /= FlxG.height;
 
 			if (FlxG.mouse.wheel > 0) {
-				lightHeight2 = FlxMath.bound(lightHeight2 + 0.1, 0, 1);
+				lightHeight2 = FlxMath.bound(lightHeight2 + 0.1, 0.01, 1);
 			} else if (FlxG.mouse.wheel < 0) {
-				lightHeight2 = FlxMath.bound(lightHeight2 - 0.1, 0, 1);
+				lightHeight2 = FlxMath.bound(lightHeight2 - 0.1, 0.01, 1);
 			}
 		}
 	}

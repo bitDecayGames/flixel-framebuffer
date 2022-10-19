@@ -1,11 +1,6 @@
-import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.text.FlxText;
-import flixel.tweens.FlxTween;
-import flixel.util.FlxColor;
 
 class CoinState extends LightingState {
 	public var lightPoint = FlxPoint.get(0.4, 0.2);

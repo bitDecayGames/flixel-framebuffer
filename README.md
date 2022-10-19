@@ -7,6 +7,8 @@ The particular use-case here is a dynamic lighting shader, but the same concept 
 - [Concept](#concept)
 - [Example](#example)
 - [Implementation](#implementation)
+  - [Controls](#controls)
+- [Shader](#shader)
 - [Limitations](#limitations)
 
 ## Concept
@@ -31,8 +33,13 @@ The underlying unshaded rotating diamond sprite sheet
 ![Unshaded](./assets/images/diamond.png)
 
 The normal map data. This one was crafted by hand, but there are various tools out there to help with creating normal maps.
+* An interesting tool I stumbled across while building this repo is [Laigter on itch.io](https://azagaya.itch.io/laigter), which is available as a "Name your own price" tool for creating normal maps along with other image data for 2D sprites.
 
-![Normal Data](./assets/images/diamond_norm.png)
+![Normal Map](./assets/images/diamond_norm.png)
+
+The height map data. Black represents further away from the camera. The lighter the pixel, the closer toward the camera.
+
+![Height Map](./assets/images/diamond_height.png)
 
 The final product with the animation playing and a light inserted into the scene.
 
@@ -47,10 +54,26 @@ The standard Flixel code path renders all cameras sequentially with no way to ad
 
 There are a few uses of `@access` here in order to be able to render cameras in the order we want. The key here is that we actually render the normal map composite as part of the `LightingState`'s `draw()` function so that when the base camera has the proper normal data before it is rendered.
 
-* Pressing `SPACE` will allow you to toggle between to the view of the Normal Camera to see what it is rendering.
-* Use of plain `FlxSprite` is fine: no errors occur and the sprites can be treated as though there is no shader on them, or as though the lights do not illuminate them.
+* Use of plain `FlxSprite` is fine: no errors occurs. The shader included in this example project treats them as a flat surface facing directly at the camera.
+
+### Controls
+
+* `LEFT CLICK` and `RIGHT CLICK` moves the cameras
+* `SCROLL WHEEL` while holding a mouse button changes the height of the given camera
+* `SPACE` will allow you to cycle through cameras to see what it is rendering.
+* `M` creates more objects
+* `SHIFT` will shake the camera
+
+## Shader
+
+The Shader code in `LightingShader.hx` uses three input images
+1. The base sprites: The standard `FlxCamera` view of the unshaded base sprites
+2. The normal map data: The composite image from a `FlxCamera` that only sees the normal map sprites
+3. The height map data: The composite image from a `FlxCamera` that only sees the height map sprites
+
+In theory, as many images can be fed in as may be needed to achieve the desired effect.
 
 ## Limitations
 
 * `LightingState` tries to automate sprite management as best it can. However some things are tedious to handle transparently, such as setting `pixelPerfectRender` on the underlying normal sprite. There will need to be some expansion on alignment of properties between the base sprite and the underlying normal. As of this example implementation, anything _other_ than the `x` and `y` coordinates will have to be manually kept in sync.
-* The shader here is a very rough shader taken from an old project. It is far from perfect -- it may even be far from good, but it is enough to prove the concept.
+* Camera zoom is not currently supported.

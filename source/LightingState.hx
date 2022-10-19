@@ -52,11 +52,15 @@ class LightingState extends FlxState {
 		baseCam.setFilters([new ShaderFilter(lightShader)]);
 
 		// Register so we can update our cameras once the main game camera has updated
-		FlxG.signals.postUpdate.add(() -> {
-			for (camera in bufferCameraFrontEnd.list) {
-				syncCamera(camera);
-			}
-		});
+		FlxG.signals.postUpdate.add(syncAllCameras);
+	}
+
+	// Due to the trickery around how we are managing the cameras, we have to clean up after ourselves
+	override function destroy() {
+		super.destroy();
+		FlxG.signals.postUpdate.remove(syncAllCameras);
+		bufferCameraFrontEnd.remove(normalCamera);
+		bufferCameraFrontEnd.remove(heightCamera);
 	}
 
 	// Makes sure to handle any LightSprites and set cameras properly
@@ -72,6 +76,12 @@ class LightingState extends FlxState {
 		}
 
 		return ret;
+	}
+
+	private function syncAllCameras() {
+		for (camera in bufferCameraFrontEnd.list) {
+			syncCamera(camera);
+		}
 	}
 
 	// Sync camera properties so the frame buffers align

@@ -87,6 +87,10 @@ class PlayState extends LightingState {
 		}
 
 		objectLabel.text = 'Objects (\'M\' to add more): $objectCount';
+
+		if (FlxG.keys.justPressed.RIGHT) {
+			FlxG.switchState(new CoinState());
+		}
 	}
 
 	private function makeObjects() {

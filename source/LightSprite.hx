@@ -43,5 +43,6 @@ class LightSprite extends FlxSprite {
 		c.y = this.y;
 		c.pixelPerfectRender = this.pixelPerfectRender;
 		c.pixelPerfectPosition = this.pixelPerfectPosition;
+		c.scale.copyFrom(this.scale);
 	}
 }

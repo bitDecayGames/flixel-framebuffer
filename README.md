@@ -41,7 +41,7 @@ The height map data. Black represents further away from the camera. The lighter 
 
 ![Height Map](./assets/images/diamond_height.png)
 
-The final product with the animation playing and a light inserted into the scene.
+The final product with the animation playing and two lights added into the scene.
 
 ![Shaded](./art/spin.gif)
 

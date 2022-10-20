@@ -15,14 +15,14 @@ The particular use-case here is a dynamic lighting shader, but the same concept 
 
 This dynamic lighting shader has a few pieces:
 1. Unshaded game render
-  * All the base sprites on screen in their raw state in the game as seen by the camera
-1. Normal map data
-  * The normal data of all sprites as seen by the camera
-1. Height map data
-  * The height data of all sprites as seen by the camera
+    * All the base sprites on screen in their raw state in the game as seen by the camera
+1. Normal map render
+    * The normal data of all sprites as seen by the camera
+1. Height map render
+    * The height data of all sprites as seen by the camera
 1. Lighting information
-  * Any lights in the environment and their position relative to the current view of the camera
-  * Ambient lighting to provide a base level of illumination
+    * Any lights in the environment and their position relative to the current view of the camera
+    * Ambient lighting to provide a base level of illumination
 
 The shader code itself will consume all of this information and provide the final rendered frame to show on screen.
 

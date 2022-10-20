@@ -28,20 +28,20 @@ The shader code itself will consume all of this information and provide the fina
 
 ## Example
 
-The underlying unshaded rotating diamond sprite sheet
+**Base Unshaded Sprite** - The underlying unshaded rotating diamond sprite sheet
 
 ![Unshaded](./assets/images/diamond.png)
 
-The normal map data. This one was crafted by hand, but there are various tools out there to help with creating normal maps.
-* An interesting tool I stumbled across while building this repo is [Laigter on itch.io](https://azagaya.itch.io/laigter), which is available as a "Name your own price" tool for creating normal maps along with other image data for 2D sprites.
+**Normal Map** - This one was crafted by hand, but there are various tools out there to help with creating normal maps.
 
 ![Normal Map](./assets/images/diamond_norm.png)
+> * An interesting tool I stumbled across while building this repo is [Laigter on itch.io](https://azagaya.itch.io/laigter), which is available as a "Name your own price" tool for creating normal maps along with other image data for 2D sprites.
 
-The height map data. Black represents further away from the camera. The lighter the pixel, the closer toward the camera.
+**Height Map** - Black represents further away from the camera. The lighter the pixel, the closer toward the camera.
 
 ![Height Map](./assets/images/diamond_height.png)
 
-The final product with the animation playing and two lights added into the scene.
+**Post Shader** - The final product with the animation playing and two lights added into the scene.
 
 ![Shaded](./art/spin.gif)
 
@@ -58,6 +58,7 @@ There are a few uses of `@access` here in order to be able to render cameras in 
 
 ### Controls
 
+* `LEFT` and `RIGHT` arrows allow switching between different test States (note that not all States support all the other controls)
 * `LEFT CLICK` and `RIGHT CLICK` moves the cameras
 * `SCROLL WHEEL` while holding a mouse button changes the height of the given camera
 * `SPACE` will allow you to cycle through cameras to see what it is rendering.

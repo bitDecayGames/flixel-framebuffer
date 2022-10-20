@@ -38,7 +38,8 @@ class LightingShader extends FlxShader {
 			// pull out the color vectors from the source image and the normal image
 			vec4 source = flixel_texture2D(bitmap, openfl_TextureCoordv);
 			vec3 normal = texture2D(normalTex, openfl_TextureCoordv).rgb;
-			// the image is black and white (using all 3 rbg channels), but we can just take one of them
+			// the image is black and white (using all 3 rbg channels), but we can just take one of them.
+			// White is 1, Black is 0
 			float fragHeight = texture2D(heightTex, openfl_TextureCoordv).z;
 
 			if (length(normal) == 0.) {

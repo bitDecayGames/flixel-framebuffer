@@ -13,6 +13,9 @@ class CoinState extends LightingState {
 		var baseSprite = new LightSprite(FlxG.width / 2, FlxG.height / 2, AssetPaths.coin__png, true, 32, 32);
 		baseSprite.pixelPerfectRender = true;
 		baseSprite.scale.set(3, 3);
+		// baseSprite.animation.add('spin', [for (i in 0...10) i]);
+		baseSprite.animation.add('spin', [2]);
+		baseSprite.animation.play('spin');
 		add(baseSprite);
 
 		lightShader.lightColor1.value = [2.0, 2.0, 2.0];
@@ -21,6 +24,8 @@ class CoinState extends LightingState {
 		lightShader.ambientStrength.value = [0.2];
 
 		lightShader.debugLights.value = [true];
+
+		FlxG.watch.add(this, 'lightHeight', "Light Height:");
 	}
 
 	override public function update(elapsed:Float):Void {

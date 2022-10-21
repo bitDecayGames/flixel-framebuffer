@@ -14,7 +14,7 @@ class CoinState extends LightingState {
 		baseSprite.pixelPerfectRender = true;
 		baseSprite.scale.set(3, 3);
 		// baseSprite.animation.add('spin', [for (i in 0...10) i]);
-		baseSprite.animation.add('spin', [2]);
+		baseSprite.animation.add('spin', [0, 1, 2, 1,], 10);
 		baseSprite.animation.play('spin');
 		add(baseSprite);
 

@@ -24,11 +24,13 @@ class PlayState extends LightingState {
 	override public function create():Void {
 		super.create();
 
-		uiCam = new FlxCamera();
-		FlxG.cameras.add(uiCam, false);
+		// TODO: Adding this camera somehow causes the shader camera to stop working?
+		// uiCam = new FlxCamera();
+		// FlxG.cameras.add(uiCam, false);
+		// FlxG.cameras.add(uiCam, true);
 
-		objectLabel.cameras = [uiCam];
-		add(objectLabel);
+		// objectLabel.cameras = [uiCam];
+		// add(objectLabel);
 
 		makeObjects();
 

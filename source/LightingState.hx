@@ -36,17 +36,21 @@ class LightingState extends FlxState {
 	override public function create():Void {
 		normalTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 		normalCamera = new FlxCamera();
-		normalCamera.bgColor = FlxColor.TRANSPARENT;
 
 		heightTexture = new BitmapData(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 		heightCamera = new FlxCamera();
-		heightCamera.bgColor = FlxColor.TRANSPARENT;
 
 		// Some trickery to get our side CameraFrontEnd configured properly
+		// TODO: This reset is setting the BG Color somehow for future cameras even though this is a separate
+		//       instance of a CameraFrontEnd
 		bufferCameraFrontEnd.reset(normalCamera);
 		bufferCameraFrontEnd.add(heightCamera);
 		FlxG.cameras.reset();
 		baseCam = FlxG.camera;
+
+		// So we set the bg colors after we tinker with the static stuff
+		normalCamera.bgColor = FlxColor.BLACK;
+		heightCamera.bgColor = FlxColor.BLACK;
 
 		lightShader = new LightingShader(normalTexture, heightTexture);
 		baseCam.setFilters([new ShaderFilter(lightShader)]);

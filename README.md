@@ -21,7 +21,7 @@ This dynamic lighting shader needs a few pieces as input:
     * All the base sprites on screen in their raw state in the game as seen by the camera
     * This comes from the standard `camera` on the FlxState
 1. Additional graphical information. Each layer here has a special camera that only 'sees' the correct assets for the type of render being built
-    1. Normal map render 
+    1. Normal map render
     1. Height map render
 1. Lighting information
     * Any lights in the environment and their position relative to the current view of the camera
@@ -30,7 +30,7 @@ This dynamic lighting shader needs a few pieces as input:
 
 The shader code itself will consume all of this information and provide the final rendered frame to show on screen.
 
-## Example
+## Example (Dyanmic Lighting Shader)
 
 **Base Unshaded Sprite** - The underlying unshaded rotating diamond sprite sheet
 
@@ -41,15 +41,19 @@ The shader code itself will consume all of this information and provide the fina
 ![Normal Map](./assets/images/diamond_norm.png)
 > * An interesting tool I stumbled across while building this repo is [Laigter on itch.io](https://azagaya.itch.io/laigter), which is available as a "Name your own price" tool for creating normal maps along with other image data for 2D sprites.
 
-**Height Map** - Black represents further away from the camera. The lighter the pixel, the closer toward the camera.
+**Height Map** - This map uses two of the color channels to produce a range of height that this pixel occupies along the z-axis. The green represents the lower bound, and red represents the upper bound.
 
 ![Height Map](./assets/images/diamond_height.png)
 
 **Post Shader** - The final product with the animation playing and two lights added into the scene.
 
-![Shaded](./art/spin.gif)
+![Shaded](./art/octahedron_shadow.gif)
 
-## Implementation
+> * Note shadow is effectively cast from a 3-dimensional object and shows both a top and bottom point.
+
+There is some artifacting happening in the form of miscolored pixels on the faces of the octahedron due to how the shadows are being calculated. I plan to address this. The shadows themselves are also not as crisp as I would like.
+
+## Flixel Implementation
 
 The idea here is to make use of the capabilities of `FlxCamera` to render our composite images that the Shader will use.
 

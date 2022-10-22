@@ -86,3 +86,4 @@ In theory, as many images can be fed in as may be needed to achieve the desired 
 
 * `LightingState` tries to automate sprite management as best it can. However some things are tedious to handle transparently, such as setting `pixelPerfectRender` on the underlying normal sprite. There will need to be some expansion on alignment of properties between the base sprite and the underlying normal. As of this example implementation, anything _other_ than the `x` and `y` coordinates will have to be manually kept in sync.
 * Camera zoom is not currently supported.
+> **NOTE:** As this has some heavy-handed workarounds to how cameras are managed within HaxeFlixel, tread carefully when manipulating cameras (such as adding new cameras to a state), as it can cause things to stop rendering properly. I'll be documenting these alongside the code as I uncover and find solutions to them.

@@ -25,7 +25,7 @@ class LightingShader extends FlxShader {
 		uniform vec3 ambientColor;
 		uniform float ambientStrength;
 
-		uniform float shadowStep;
+		uniform float shadowStepIncrement;
 
 		uniform bool debugLights;
 
@@ -42,8 +42,8 @@ class LightingShader extends FlxShader {
 			toLight.y *= -1.0;
 
 			float distance = 0.;
-			for (int i = 1; i < 1000; i++) {
-				distance = shadowStep * 2.0 * float(i);
+			for (int i = 1; i < 200; i++) {
+				distance = shadowStepIncrement * float(i);
 				if (distance >= maxDistance) {
 					return false;
 				}
@@ -199,8 +199,7 @@ class LightingShader extends FlxShader {
 		resolution.value = [pixelRes.x, pixelRes.y];
 
 		// steps should be one pixel at a time
-		shadowStep.value = [1.0 / FlxG.width];
-		trace(shadowStep.value);
+		shadowStepIncrement.value = [(1.0 / FlxG.width)];
 	}
 
 	// for this to work properly, you will need to convert your light position into local coordinates for the camera in terms from 0.0-1.0

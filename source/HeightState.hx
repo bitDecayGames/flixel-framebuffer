@@ -14,6 +14,8 @@ class HeightState extends LightingState {
 	public var lightHeight = 0.05;
 	public var lightHeight2 = 1.0;
 
+	public var stepSize = 0.005;
+
 	override public function create():Void {
 		super.create();
 
@@ -26,8 +28,9 @@ class HeightState extends LightingState {
 
 		FlxG.watch.add(this, "lightHeight", "Light1 Height:");
 		FlxG.watch.add(this, "lightHeight2", "Light2 Height:");
+		FlxG.watch.add(this, "stepSize", "Step Size: ");
 
-		lightShader.lightColor1.value = [0.0, 4.0, 4.0];
+		lightShader.lightColor1.value = [0.0, 2.0, 2.0];
 		lightShader.lightColor2.value = [10.0, 1.0, 0.0];
 
 		lightShader.ambientColor.value = [1.0, 1.0, 1.0];
@@ -40,6 +43,7 @@ class HeightState extends LightingState {
 		super.update(elapsed);
 
 		lightShader.setLightPositions([lightPoint, lightPoint2], [lightHeight, lightHeight2]);
+		lightShader.shadowStepIncrement.value = [stepSize];
 
 		if (FlxG.keys.justPressed.SPACE) {
 			toggleLightingDebugCamera();
@@ -55,9 +59,7 @@ class HeightState extends LightingState {
 			} else if (FlxG.mouse.wheel < 0) {
 				lightHeight = FlxMath.bound(lightHeight - 0.1, 0.01, 2);
 			}
-		}
-
-		if (FlxG.mouse.pressedRight) {
+		} else if (FlxG.mouse.pressedRight) {
 			lightPoint2.set(FlxG.mouse.getScreenPosition().x, FlxG.mouse.getScreenPosition().y);
 			lightPoint2.x /= FlxG.width;
 			lightPoint2.y /= FlxG.height;
@@ -67,6 +69,13 @@ class HeightState extends LightingState {
 			} else if (FlxG.mouse.wheel < 0) {
 				lightHeight2 = FlxMath.bound(lightHeight2 - 0.1, 0.01, 2);
 			}
+		} else {
+			if (FlxG.mouse.wheel > 0) {
+				stepSize += .001;
+			} else if (FlxG.mouse.wheel < 0) {
+				stepSize -= .001;
+			}
+			stepSize = FlxMath.bound(stepSize, 0.000, 10);
 		}
 
 		if (FlxG.keys.justPressed.RIGHT) {

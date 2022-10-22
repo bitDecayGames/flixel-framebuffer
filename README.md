@@ -13,20 +13,22 @@ The particular use-case here is a dynamic lighting shader, but the same concept 
 
 ## Concept
 
-This dynamic lighting shader has a few pieces:
+![Concept](./art/concept.png)
+
+This dynamic lighting shader needs a few pieces as input:
+
 1. Unshaded game render
     * All the base sprites on screen in their raw state in the game as seen by the camera
-1. Normal map render
-    * The normal data of all sprites as seen by the camera
-1. Height map render
-    * The height data of all sprites as seen by the camera
+    * This comes from the standard `camera` on the FlxState
+1. Additional graphical information. Each layer here has a special camera that only 'sees' the correct assets for the type of render being built
+    1. Normal map render 
+    1. Height map render
 1. Lighting information
     * Any lights in the environment and their position relative to the current view of the camera
     * Ambient lighting to provide a base level of illumination
+    * **NOTE:** As lights move or change, or the camera scrolls, the shader needs to be updated
 
 The shader code itself will consume all of this information and provide the final rendered frame to show on screen.
-
-![Concept](./art/concept.png)
 
 ## Example
 

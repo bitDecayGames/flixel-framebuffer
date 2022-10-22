@@ -50,7 +50,7 @@ class CoinState extends LightingState {
 		}
 
 		if (FlxG.keys.justPressed.RIGHT) {
-			FlxG.switchState(new PlayState());
+			FlxG.switchState(new HeightState());
 		}
 	}
 }

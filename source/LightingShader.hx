@@ -1,5 +1,6 @@
 import flixel.FlxG;
 import flixel.math.FlxPoint;
+import flixel.math.FlxVector;
 import flixel.system.FlxAssets.FlxShader;
 import openfl.display.BitmapData;
 
@@ -24,6 +25,8 @@ class LightingShader extends FlxShader {
 		uniform vec3 ambientColor;
 		uniform float ambientStrength;
 
+		uniform float shadowStep;
+
 		uniform bool debugLights;
 
 		// This value dictates how quickly distance affects light brightness.
@@ -33,25 +36,55 @@ class LightingShader extends FlxShader {
 		uniform float lightFadeFactor;
 
 		uniform float aspectRatio;
+		uniform vec2 resolution;
 
-		vec4 getLight(vec3 lPos, vec3 color) {
+		bool isInShadow(vec3 fragPosition, vec3 toLight, float maxDistance) {
+			toLight.y *= -1.0;
+
+			float distance = 0.;
+			for (int i = 1; i < 1000; i++) {
+				distance = shadowStep * 2.0 * float(i);
+				if (distance >= maxDistance) {
+					return false;
+				}
+
+				vec3 raySampleCoords = fragPosition + (toLight * distance) / vec3(aspectRatio, 1., 1.);
+				vec4 heightSample = texture2D(heightTex, raySampleCoords.xy);
+
+				if (heightSample.r > raySampleCoords.z && raySampleCoords.z > heightSample.g) {
+					// the light ray hits within our height range, so the pixel blocks the light
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		vec4 getIllumination(vec3 lPos, vec3 color) {
 			// pull out the color vectors from the source image and the normal image
 			vec4 source = flixel_texture2D(bitmap, openfl_TextureCoordv);
 			vec3 normal = texture2D(normalTex, openfl_TextureCoordv).rgb;
-			// the image is black and white (using all 3 rbg channels), but we can just take one of them.
-			// White is 1, Black is 0
-			float fragHeight = texture2D(heightTex, openfl_TextureCoordv).z;
+			// The height data is currently represented by two numbers:
+			//    green: represents the minimum height for the pixel
+			//    red: represents the maximum height for the pixel
+			vec4 fragHeightData = texture2D(heightTex, openfl_TextureCoordv);
 
 			if (length(normal) == 0.) {
 				// No normal data, assume flat surface with normal pointing directly at camera
 				normal = vec3(0.5, 0.5, 1.0);
 			}
 
-			// this is the vector from our fragment to our light position
-			vec3 fragToLight = lPos - vec3(openfl_TextureCoordv, fragHeight);
+			// The red channel contains our "max" height for the frag, so that is our reference point for the frag
+			vec3 fragPosition = vec3(openfl_TextureCoordv, fragHeightData.r);
 
-			// adjust for aspect ratio
-			fragToLight.xy /= vec2(1, aspectRatio);
+			// TODO: we want each pixel to gauge height information based on the center of the nearest pixel. This
+			// should clean up the little height artifacts significantly
+
+			// this is the vector from our fragment to our light position
+			vec3 fragToLight = lPos - fragPosition;
+
+			// adjust for aspect ratio to get our vector "circular"
+			fragToLight.xy /= vec2(1., aspectRatio);
 
 			// invert the y value since uv coords have reversed coordinate system
 			fragToLight.y *= -1.0;
@@ -63,6 +96,13 @@ class LightingShader extends FlxShader {
 
 			// normalize the vector for further maths
 			fragToLight = normalize(fragToLight);
+
+			// TODO: Here we do a shadow check to see if this light is actually illuminating this pixel
+			bool shaded = isInShadow(fragPosition, fragToLight, distance);
+			if (shaded) {
+				source.rgb = vec3(0.);
+				return source;
+			}
 
 			// normal values comes in as a value between 0.0 and 1.0 (color value of 0-255)
 			// we want the range to be between -1.0 and 1.0
@@ -104,13 +144,13 @@ class LightingShader extends FlxShader {
 		{
 			vec4 litColor = vec4(0.,0.,0.,0.);
 			if (numLights > 0.0) {
-				litColor = max(litColor, getLight(lightPos1, lightColor1));
+				litColor = max(litColor, getIllumination(lightPos1, lightColor1));
 			}
 			if (numLights > 1.0) {
-				litColor = max(litColor, getLight(lightPos2, lightColor2));
+				litColor = max(litColor, getIllumination(lightPos2, lightColor2));
 			}
 			if (numLights > 2.0) {
-				litColor = max(litColor, getLight(lightPos3, lightColor3));
+				litColor = max(litColor, getIllumination(lightPos3, lightColor3));
 			}
 
 			vec4 source = flixel_texture2D(bitmap, openfl_TextureCoordv);
@@ -153,6 +193,14 @@ class LightingShader extends FlxShader {
 
 		var ratio = 1.0 * FlxG.width / FlxG.height;
 		aspectRatio.value = [ratio];
+		trace(ratio);
+
+		var pixelRes = FlxVector.get(1.0 / FlxG.width, 1.0 / FlxG.height);
+		resolution.value = [pixelRes.x, pixelRes.y];
+
+		// steps should be one pixel at a time
+		shadowStep.value = [1.0 / FlxG.width];
+		trace(shadowStep.value);
 	}
 
 	// for this to work properly, you will need to convert your light position into local coordinates for the camera in terms from 0.0-1.0

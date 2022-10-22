@@ -10,7 +10,9 @@ class Main extends Sprite {
 		super();
 		addChild(new FlxGame(0, 0, PlayState));
 		FlxG.autoPause = false;
-		var fps = new FPS(0, 10, 0xFFFFFF);
+		var fps = new FPS(0, 10, 0x000000);
 		addChild(fps);
+
+		FlxG.mouse.useSystemCursor = true;
 	}
 }

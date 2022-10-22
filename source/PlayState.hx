@@ -9,10 +9,10 @@ import flixel.util.FlxColor;
 
 class PlayState extends LightingState {
 	public var lightPoint = FlxPoint.get(0.4, 0.2);
-	public var lightPoint2 = FlxPoint.get(0.2, 0.8);
+	public var lightPoint2 = FlxPoint.get(0.2, 1.3);
 
-	public var lightHeight = 0.05;
-	public var lightHeight2 = 1.0;
+	public var lightHeight = 0.25;
+	public var lightHeight2 = 2.0;
 
 	public var objectCount = 0;
 	public var objectLabel = new FlxText(0, 0);
@@ -24,13 +24,20 @@ class PlayState extends LightingState {
 	override public function create():Void {
 		super.create();
 
-		// TODO: Adding this camera somehow causes the shader camera to stop working?
-		// uiCam = new FlxCamera();
-		// FlxG.cameras.add(uiCam, false);
-		// FlxG.cameras.add(uiCam, true);
+		uiCam = new FlxCamera();
+		uiCam.bgColor = FlxColor.TRANSPARENT;
 
-		// objectLabel.cameras = [uiCam];
-		// add(objectLabel);
+		// if we make this a default draw target, it messes up the shader output.
+		// Still need to dig into why
+		FlxG.cameras.add(uiCam, false);
+
+		objectLabel.color = FlxColor.BLACK;
+		objectLabel.cameras = [uiCam];
+		add(objectLabel);
+
+		var bg = new FlxSprite();
+		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.WHITE);
+		add(bg);
 
 		makeObjects();
 
@@ -38,8 +45,7 @@ class PlayState extends LightingState {
 		FlxG.watch.add(this, "lightHeight2", "Light2 Height:");
 
 		lightShader.lightColor1.value = [0.0, 4.0, 4.0];
-		lightShader.lightColor2.value = [10.0, 1.0, 0.0];
-		lightShader.lightColor3.value = [1.0, 0.0, 0.0];
+		lightShader.lightColor2.value = [6.0, 3.0, 0.0];
 
 		lightShader.ambientColor.value = [1.0, 1.0, 1.0];
 		lightShader.ambientStrength.value = [0.2];
@@ -70,9 +76,9 @@ class PlayState extends LightingState {
 			lightPoint.y /= FlxG.height;
 
 			if (FlxG.mouse.wheel > 0) {
-				lightHeight = FlxMath.bound(lightHeight + 0.1, 0.01, 1);
+				lightHeight = FlxMath.bound(lightHeight + 0.1, 0.01, 2);
 			} else if (FlxG.mouse.wheel < 0) {
-				lightHeight = FlxMath.bound(lightHeight - 0.1, 0.01, 1);
+				lightHeight = FlxMath.bound(lightHeight - 0.1, 0.01, 2);
 			}
 		}
 
@@ -82,9 +88,9 @@ class PlayState extends LightingState {
 			lightPoint2.y /= FlxG.height;
 
 			if (FlxG.mouse.wheel > 0) {
-				lightHeight2 = FlxMath.bound(lightHeight2 + 0.1, 0.01, 1);
+				lightHeight2 = FlxMath.bound(lightHeight2 + 0.1, 0.01, 2);
 			} else if (FlxG.mouse.wheel < 0) {
-				lightHeight2 = FlxMath.bound(lightHeight2 - 0.1, 0.01, 1);
+				lightHeight2 = FlxMath.bound(lightHeight2 - 0.1, 0.01, 2);
 			}
 		}
 
@@ -95,16 +101,16 @@ class PlayState extends LightingState {
 		}
 	}
 
-	private function makeObjects() {
-		for (i in 0...5) {
+	private function makeObjects(perEach:Int = 3) {
+		for (i in 0...perEach) {
 			makeUnshadedSprite();
 		}
 
-		for (i in 0...10) {
-			makeDiamond();
+		for (i in 0...perEach) {
+			makeOctahedron();
 		}
 
-		for (i in 0...10) {
+		for (i in 0...perEach) {
 			makeCircle();
 		}
 	}
@@ -118,7 +124,7 @@ class PlayState extends LightingState {
 		return path;
 	}
 
-	function makeDiamond() {
+	function makeOctahedron() {
 		var path = getRandomPath(10);
 
 		var baseSprite = new LightSprite(path[0].x, path[0].y, AssetPaths.diamond__png, true, 32, 32);
